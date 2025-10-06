@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Leaflet 1.4 + Windy Map Forecast API</title>
+  <title>Leaflet 1.4 + Windy with Slider + Markers</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
   <!-- Leaflet CSS v1.4.0 -->
@@ -11,7 +11,7 @@
     href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
   />
 
-  <!-- MarkerCluster CSS (compatible with v1.4.x) -->
+  <!-- MarkerCluster CSS v1.4.1 -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
@@ -33,14 +33,15 @@
       font-weight: bold;
       text-align: center;
       line-height: 30px;
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid #264653;
     }
   </style>
 </head>
 <body>
-  <!-- Windy container -->
+  <!-- This container will hold the Windy map and slider -->
   <div id="windy"></div>
 
   <!-- 1. Leaflet JS v1.4.0 -->
@@ -52,18 +53,21 @@
 
   <script>
     const options = {
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',   // ← replace with your Map Forecast API key
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // ← Replace with your Map Forecast API key
       lat: 51.1657,
       lon: 10.4515,
       zoom: 6,
       verbose: true
     };
 
+    // Initialize Windy API
     windyInit(options, windyAPI => {
       console.log('✅ Windy API ready', windyAPI);
-      const { map } = windyAPI;
 
-      // Add marker clusters
+      // Destructure map, picker, and store from windyAPI
+      const { map, picker, store } = windyAPI;
+
+      // 1. Add marker clusters
       const markers = L.markerClusterGroup();
       fetch('https://n8n.beaglesystems.org/webhook/locations-json')
         .then(r => r.json())
@@ -82,6 +86,12 @@
           if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
         })
         .catch(console.error);
+
+      // 2. Set the weather overlay type (wind, rain, temp, etc.)
+      store.set('overlay', 'wind');
+
+      // 3. Add the time slider control
+      picker.addTo(map);
     });
   </script>
 </body>
