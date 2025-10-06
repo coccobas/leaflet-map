@@ -28,9 +28,20 @@
       padding: 0;
     }
 
-    /* make map container positioned for absolute children */
+    /* Make the container a positioning context */
     #windy {
       position: relative;
+    }
+
+    /* Leaflet map tiles sit at z-index 1 by default */
+    .leaflet-container .leaflet-pane .leaflet-tile-pane {
+      z-index: 1;
+    }
+
+    /* Ensure markers and overlay canvases layer above tiles */
+    .leaflet-container .leaflet-pane .leaflet-marker-pane,
+    .leaflet-container .leaflet-pane .leaflet-overlay-pane {
+      z-index: 2;
     }
 
     .marker-label {
@@ -39,21 +50,22 @@
       font-weight: bold;
       text-align: center;
       line-height: 30px;
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid #264653;
     }
 
-    /* bring the Windy time-slider control to front */
+    /* Bring the Windy time-slider control to front */
     .windy-control {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      background: rgba(255,255,255,0.9);
-      padding: 5px 10px;
-      border-radius: 4px;
+      position: absolute !important;
+      bottom: 10px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 10000 !important;     /* very high to sit above everything */
+      background: rgba(255,255,255,0.9) !important;
+      padding: 5px 10px !important;
+      border-radius: 4px !important;
     }
   </style>
 </head>
@@ -70,7 +82,7 @@
 
   <script>
     const options = {
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // ← Replace with your Map Forecast API key
+      key: 'YOUR_WINDY_API_KEY',      // Replace with your Windy Map Forecast API key
       lat: 51.1657,
       lon: 10.4515,
       zoom: 6,
@@ -81,7 +93,7 @@
     windyInit(options, windyAPI => {
       console.log('✅ Windy API ready', windyAPI);
 
-      // Destructure map, picker, and store from windyAPI
+      // Destructure map, picker, and store
       const { map, picker, store } = windyAPI;
 
       // 1. Add marker clusters
