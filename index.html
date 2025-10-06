@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Leaflet + Windy Map Forecast API</title>
+  <title>Leaflet 1.4 + Windy Map Forecast API</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <!-- Leaflet CSS -->
+  <!-- Leaflet CSS v1.4.0 -->
   <link
     rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
   />
 
-  <!-- MarkerCluster CSS -->
+  <!-- MarkerCluster CSS (compatible with v1.4.x) -->
   <link
     rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
   />
   <link
     rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
   />
 
   <style>
@@ -33,52 +33,40 @@
       font-weight: bold;
       text-align: center;
       line-height: 30px;
-      width: 30px;
-      height: 30px;
+      width: 30px; height: 30px;
       border-radius: 50%;
       border: 2px solid #264653;
     }
   </style>
 </head>
 <body>
-  <!-- Windy map container -->
+  <!-- Windy container -->
   <div id="windy"></div>
 
-  <!-- 1. Leaflet JS (must load first) -->
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  
-  <!-- 2. MarkerCluster JS -->
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  
-  <!-- 3. Windy Map Forecast API -->
+  <!-- 1. Leaflet JS v1.4.0 -->
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+  <!-- 2. MarkerCluster JS v1.4.1 -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <!-- 3. Windy Map Forecast SDK -->
   <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
 
   <script>
     const options = {
-      // Required: Your Windy API key
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ', // ← Replace with your Map Forecast API key
-      
-      // Initial map position
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',   // ← replace with your Map Forecast API key
       lat: 51.1657,
       lon: 10.4515,
       zoom: 6,
-      
-      // Put additional console output
       verbose: true
     };
 
-    // Initialize Windy API
     windyInit(options, windyAPI => {
       console.log('✅ Windy API ready', windyAPI);
-      
-      // Get the Leaflet map instance from Windy
       const { map } = windyAPI;
 
-      // Add your marker clusters to the Windy map
+      // Add marker clusters
       const markers = L.markerClusterGroup();
-      
-      fetch('http://n8n.beaglesystems.org/webhook/locations-json')
-        .then(res => res.json())
+      fetch('https://n8n.beaglesystems.org/webhook/locations-json')
+        .then(r => r.json())
         .then(data => {
           data.forEach(loc => {
             const icon = L.divIcon({
@@ -91,9 +79,7 @@
               .addTo(markers);
           });
           map.addLayer(markers);
-          if (data.length) {
-            map.fitBounds(markers.getBounds().pad(0.2));
-          }
+          if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
         })
         .catch(console.error);
     });
