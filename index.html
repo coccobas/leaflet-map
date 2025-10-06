@@ -6,11 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+  />
 
   <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+
+  <!-- Windy Leaflet Plugin CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@windycom/leaflet-windy@1.1.0/dist/leaflet-windy.min.css"
+  />
 
   <style>
     html, body, #map {
@@ -18,44 +33,40 @@
       margin: 0;
       padding: 0;
     }
-    .windy-map-overlay {
-      z-index: 500 !important;
-      pointer-events: none;
-    }
     .marker-label {
       background: #2A9D8F;
       color: white;
       font-weight: bold;
       text-align: center;
       line-height: 30px;
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid #264653;
     }
   </style>
 </head>
 <body>
-
   <div id="map"></div>
 
-  <!-- 1. Leaflet -->
+  <!-- 1. Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <!-- 2. MarkerCluster -->
+  <!-- 2. MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <!-- 3. Windy (after Leaflet!) -->
-  <script src="https://api.windy.com/assets/libBoot.js"></script>
+  <!-- 3. Windy Leaflet Plugin JS -->
+  <script src="https://unpkg.com/@windycom/leaflet-windy@1.1.0/dist/leaflet-windy.min.js"></script>
 
   <script>
-    // Initialize Leaflet
-    const map = L.map('map').setView([51.1657,10.4515],6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap contributors'
+    // Initialize Leaflet map
+    const map = L.map('map').setView([51.1657, 10.4515], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Add your markers
+    // Add marker clusters
     const markers = L.markerClusterGroup();
-    fetch('https://n8n.beaglesystems.org/webhook/locations-json')
-      .then(r => r.json())
+    fetch('http://n8n.beaglesystems.org/webhook/locations-json)
+      .then(res => res.json())
       .then(data => {
         data.forEach(loc => {
           const icon = L.divIcon({
@@ -64,32 +75,23 @@
             iconSize: [30, 30]
           });
           L.marker([loc.lat, loc.lng], { icon })
-           .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
-           .addTo(markers);
+            .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
+            .addTo(markers);
         });
         map.addLayer(markers);
-        if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
+        if (data.length) {
+          map.fitBounds(markers.getBounds().pad(0.2));
+        }
       })
       .catch(console.error);
 
-    // Check that windyInit is defined
-    console.log('windyInit defined?', typeof windyInit);
-
-    // Boot Windy if loaded
-    if (typeof windyInit === 'function') {
-      windyInit({
-        key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',
-        lat: 51.1657, lon: 10.4515, zoom: 6
-      }, windyAPI => {
-        console.log('✅ Windy booted', windyAPI);
-        const { overlay, picker } = windyAPI;
-        overlay.setParam('overlay', 'rain');
-        overlay.addTo(map);
-        picker.addTo(map);
-      });
-    } else {
-      console.error('❌ windyInit not available. Check libBoot.js URL.');
-    }
+    // Add Windy overlay as a Leaflet layer
+    const windyLayer = L.windyLayer({
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // Your Windy Map Forecast API key
+      overlay: 'wind',            // 'wind', 'rain', 'temp', etc.
+      debug: false
+    });
+    windyLayer.addTo(map);
   </script>
 </body>
 </html>
