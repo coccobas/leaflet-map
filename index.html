@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Leaflet + Windy Overlay</title>
+  <title>Leaflet + Windy Map Forecast API</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
   <!-- Leaflet CSS -->
@@ -21,14 +21,8 @@
     href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
   />
 
-  <!-- Windy Leaflet Plugin CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/@windycom/leaflet-windy@1.1.0/dist/leaflet-windy.min.css"
-  />
-
   <style>
-    html, body, #map {
+    html, body, #windy {
       height: 100%;
       margin: 0;
       padding: 0;
@@ -47,49 +41,62 @@
   </style>
 </head>
 <body>
-  <div id="map"></div>
+  <!-- Windy map container -->
+  <div id="windy"></div>
 
-  <!-- 1. Leaflet JS -->
+  <!-- 1. Leaflet JS (must load first) -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  
   <!-- 2. MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <!-- 3. Windy Leaflet Plugin JS -->
-  <script src="https://unpkg.com/@windycom/leaflet-windy@1.1.0/dist/leaflet-windy.min.js"></script>
+  
+  <!-- 3. Windy Map Forecast API -->
+  <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
 
   <script>
-    // Initialize the map
-    const map = L.map('map').setView([51.1657, 10.4515], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    const options = {
+      // Required: Your Windy API key
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ', // ← Replace with your Map Forecast API key
+      
+      // Initial map position
+      lat: 51.1657,
+      lon: 10.4515,
+      zoom: 6,
+      
+      // Put additional console output
+      verbose: true
+    };
 
-    // Load and cluster your markers
-    const markers = L.markerClusterGroup();
-    fetch('http://n8n.beaglesystems.org/webhook/locations-json')
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(loc => {
-          const icon = L.divIcon({
-            className: 'marker-label',
-            html: loc.label,
-            iconSize: [30, 30]
+    // Initialize Windy API
+    windyInit(options, windyAPI => {
+      console.log('✅ Windy API ready', windyAPI);
+      
+      // Get the Leaflet map instance from Windy
+      const { map } = windyAPI;
+
+      // Add your marker clusters to the Windy map
+      const markers = L.markerClusterGroup();
+      
+      fetch('http://n8n.beaglesystems.org/webhook/locations-json')
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(loc => {
+            const icon = L.divIcon({
+              className: 'marker-label',
+              html: loc.label,
+              iconSize: [30, 30]
+            });
+            L.marker([loc.lat, loc.lng], { icon })
+              .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
+              .addTo(markers);
           });
-          L.marker([loc.lat, loc.lng], { icon })
-            .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
-            .addTo(markers);
-        });
-        map.addLayer(markers);
-        if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
-      })
-      .catch(console.error);
-
-    // Add Windy overlay
-    const windyLayer = L.windyLayer({
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // ← replace with your Windy Map Forecast API key
-      overlay: 'wind',            // ← 'wind', 'rain', 'temp', etc.
-      debug: false
+          map.addLayer(markers);
+          if (data.length) {
+            map.fitBounds(markers.getBounds().pad(0.2));
+          }
+        })
+        .catch(console.error);
     });
-    windyLayer.addTo(map);
   </script>
 </body>
 </html>
