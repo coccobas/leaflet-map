@@ -38,13 +38,12 @@
 
   <div id="map"></div>
 
-  <!-- Windy SDK must load first -->
-  <script src="https://api.windy.com/assets/libBoot.js"></script>
-
-  <!-- Leaflet JS -->
+  <!-- 1. Leaflet -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <!-- MarkerCluster JS -->
+  <!-- 2. MarkerCluster -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <!-- 3. Windy (after Leaflet!) -->
+  <script src="https://api.windy.com/assets/libBoot.js"></script>
 
   <script>
     // Initialize Leaflet
