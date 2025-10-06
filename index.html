@@ -57,15 +57,15 @@
   <script src="https://unpkg.com/@windycom/leaflet-windy@1.1.0/dist/leaflet-windy.min.js"></script>
 
   <script>
-    // Initialize Leaflet map
+    // Initialize the map
     const map = L.map('map').setView([51.1657, 10.4515], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Add marker clusters
+    // Load and cluster your markers
     const markers = L.markerClusterGroup();
-    fetch('http://n8n.beaglesystems.org/webhook/locations-json)
+    fetch('http://n8n.beaglesystems.org/webhook/locations-json')
       .then(res => res.json())
       .then(data => {
         data.forEach(loc => {
@@ -79,16 +79,14 @@
             .addTo(markers);
         });
         map.addLayer(markers);
-        if (data.length) {
-          map.fitBounds(markers.getBounds().pad(0.2));
-        }
+        if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
       })
       .catch(console.error);
 
-    // Add Windy overlay as a Leaflet layer
+    // Add Windy overlay
     const windyLayer = L.windyLayer({
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // Your Windy Map Forecast API key
-      overlay: 'wind',            // 'wind', 'rain', 'temp', etc.
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',  // ← replace with your Windy Map Forecast API key
+      overlay: 'wind',            // ← 'wind', 'rain', 'temp', etc.
       debug: false
     });
     windyLayer.addTo(map);
