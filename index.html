@@ -1,88 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"/>
   <title>Leaflet + Windy Overlay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 
   <!-- MarkerCluster CSS -->
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 
   <style>
-    html, body, #map { height:100%; margin:0; padding:0; }
-    .marker-label {
-      background:#2A9D8F;color:#fff;font-weight:bold;
-      text-align:center;line-height:30px;width:30px;height:30px;
-      border-radius:50%;border:2px solid #264653;
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
     .windy-map-overlay {
       z-index: 500 !important;
+      pointer-events: none;
+    }
+    .marker-label {
+      background: #2A9D8F;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      line-height: 30px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 2px solid #264653;
     }
   </style>
 </head>
 <body>
+
   <div id="map"></div>
+
+  <!-- Windy SDK must load first -->
+  <script src="https://api.windy.com/assets/libBoot.js"></script>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <!-- MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <!-- Windy API -->
-  <script src="https://api.windy.com/assets/libBoot.js"></script>
 
   <script>
-    // 1. Initialize your Leaflet map
+    // Initialize Leaflet
     const map = L.map('map').setView([51.1657,10.4515],6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       attribution:'© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 2. Add marker clusters as before
+    // Add your markers
     const markers = L.markerClusterGroup();
     fetch('https://n8n.beaglesystems.org/webhook/locations-json')
-      .then(r=>r.json())
-      .then(data=>{
-        data.forEach(loc=>{
-          const icon = L.divIcon({className:'marker-label',html:loc.label,iconSize:[30,30]});
-          L.marker([loc.lat,loc.lng],{icon})
+      .then(r => r.json())
+      .then(data => {
+        data.forEach(loc => {
+          const icon = L.divIcon({
+            className: 'marker-label',
+            html: loc.label,
+            iconSize: [30, 30]
+          });
+          L.marker([loc.lat, loc.lng], { icon })
            .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
            .addTo(markers);
         });
         map.addLayer(markers);
-        if(data.length) map.fitBounds(markers.getBounds().pad(0.2));
+        if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
       })
       .catch(console.error);
 
-    // 3. Initialize Windy overlay
-    const options = {
-      // ⚡️ REQUIRED: your Windy API key
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',
-      // default starting view
-      lat: 51.1657,
-      lon: 10.4515,
-      zoom: 6,
-    };
+    // Check that windyInit is defined
+    console.log('windyInit defined?', typeof windyInit);
 
-    // Boot Windy
-    windyInit(options, windyAPI => {
-      // windyAPI is ready/state
-      const { picker, map: windyMap, overlay } = windyAPI;
-
-      // Add Windy’s Leaflet overlay to your map
-      // The overlay object has addTo(map) & removeFrom(map)
-      overlay.setParam('overlay', 'wind'); // e.g. wind, temp, rain
-      overlay.addTo(map);
-
-      // Optionally expose a Windy control
-      picker.addTo(map);
-    });
+    // Boot Windy if loaded
+    if (typeof windyInit === 'function') {
+      windyInit({
+        key: 'YOUR_WINDY_API_KEY',
+        lat: 51.1657, lon: 10.4515, zoom: 6
+      }, windyAPI => {
+        console.log('✅ Windy booted', windyAPI);
+        const { overlay, picker } = windyAPI;
+        overlay.setParam('overlay', 'rain');
+        overlay.addTo(map);
+        picker.addTo(map);
+      });
+    } else {
+      console.error('❌ windyInit not available. Check libBoot.js URL.');
+    }
   </script>
 </body>
 </html>
