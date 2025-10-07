@@ -17,6 +17,18 @@
     #windy {
       position: relative;
     }
+
+    /* Ensure Windy controls are visible */
+    .windy-control {
+      display: block !important;
+      z-index: 1000 !important;
+    }
+
+    /* Ensure the Windy picker (time slider) is visible */
+    .windy-picker {
+      display: block !important;
+      z-index: 1000 !important;
+    }
   </style>
 </head>
 <body>
@@ -38,6 +50,14 @@
     windyInit(options, windyAPI => {
       const { store } = windyAPI;
       store.set('overlay', 'wind');
+
+      // Force Windy controls to stay visible
+      setTimeout(() => {
+        document.querySelectorAll('.windy-control, .windy-picker').forEach(el => {
+          el.style.display = 'block';
+          el.style.zIndex = '1000';
+        });
+      }, 1000);
     });
   </script>
 </body>
