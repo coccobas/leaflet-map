@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Leaflet + Windy + MarkerCluster (Compliant)</title>
+  <title>Leaflet + Windy (Compliant)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"/>
-  <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
 
   <style>
     html, body, #windy {
@@ -20,17 +17,6 @@
     #windy {
       position: relative;
     }
-    .marker-label {
-      background: #2A9D8F;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      line-height: 30px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px solid #264653;
-    }
   </style>
 </head>
 <body>
@@ -38,8 +24,6 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-  <!-- MarkerCluster JS -->
-  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <!-- Windy Map Forecast SDK -->
   <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
 
@@ -52,31 +36,8 @@
     };
 
     windyInit(options, windyAPI => {
-      // Windy map instance
-      const { map, store } = windyAPI;
-
-      // Set overlay (this will show the time slider automatically)
+      const { store } = windyAPI;
       store.set('overlay', 'wind');
-
-      // Add marker clusters
-      const markers = L.markerClusterGroup();
-      fetch('https://n8n.beaglesystems.org/webhook/locations-json')
-        .then(r => r.json())
-        .then(data => {
-          data.forEach(loc => {
-            const icon = L.divIcon({
-              className: 'marker-label',
-              html: loc.label,
-              iconSize: [30, 30]
-            });
-            L.marker([loc.lat, loc.lng], { icon })
-              .bindPopup(`Label: ${loc.label}<br>Group: ${loc.group}`)
-              .addTo(markers);
-          });
-          map.addLayer(markers);
-          if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
-        })
-        .catch(console.error);
     });
   </script>
 </body>
