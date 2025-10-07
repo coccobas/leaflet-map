@@ -19,15 +19,9 @@
     }
 
     /* Ensure Windy controls are visible */
-    .windy-control {
+    .windy-control, .windy-picker {
       display: block !important;
-      z-index: 1000 !important;
-    }
-
-    /* Ensure the Windy picker (time slider) is visible */
-    .windy-picker {
-      display: block !important;
-      z-index: 1000 !important;
+      z-index: 9999 !important; /* Ensure controls are above other elements */
     }
   </style>
 </head>
@@ -48,16 +42,23 @@
     };
 
     windyInit(options, windyAPI => {
+      console.log('Windy API initialized:', windyAPI); // Debugging
       const { store } = windyAPI;
       store.set('overlay', 'wind');
 
-      // Force Windy controls to stay visible
-      setTimeout(() => {
+      // Observe changes to Windy controls and force them to stay visible
+      const observer = new MutationObserver(() => {
         document.querySelectorAll('.windy-control, .windy-picker').forEach(el => {
           el.style.display = 'block';
-          el.style.zIndex = '1000';
+          el.style.zIndex = '9999';
         });
-      }, 1000);
+      });
+
+      // Start observing the Windy container for changes
+      const windyContainer = document.getElementById('windy');
+      if (windyContainer) {
+        observer.observe(windyContainer, { childList: true, subtree: true });
+      }
     });
   </script>
 </body>
