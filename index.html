@@ -2,24 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Leaflet 1.4 + Windy with Slider + Markers</title>
+  <title>Leaflet + Windy + MarkerCluster (Compliant)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <!-- Leaflet CSS v1.4.0 -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
-  />
-
-  <!-- MarkerCluster CSS v1.4.1 -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
-  />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"/>
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
 
   <style>
     html, body, #windy {
@@ -27,23 +17,9 @@
       margin: 0;
       padding: 0;
     }
-
-    /* Make the container a positioning context */
     #windy {
       position: relative;
     }
-
-    /* Leaflet map tiles sit at z-index 1 by default */
-    .leaflet-container .leaflet-pane .leaflet-tile-pane {
-      z-index: 1;
-    }
-
-    /* Ensure markers and overlay canvases layer above tiles */
-    .leaflet-container .leaflet-pane .leaflet-marker-pane,
-    .leaflet-container .leaflet-pane .leaflet-overlay-pane {
-      z-index: 2;
-    }
-
     .marker-label {
       background: #2A9D8F;
       color: white;
@@ -55,53 +31,34 @@
       border-radius: 50%;
       border: 2px solid #264653;
     }
-
-    /* Bring the Windy time-slider control to front */
-    /*
-    .windy-picker,
-    .windy-picker-control,
-    .windy-picker-control .picker {
-    position: absolute !important;
-    bottom: 10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 10000 !important;
-    background: rgba(255,255,255,0.9) !important;
-    padding: 5px 10px !important;
-    border-radius: 4px !important;
-    display: block !important;
-      }
-    */
   </style>
 </head>
 <body>
-  <!-- Windy container -->
   <div id="windy"></div>
 
-  <!-- 1. Leaflet JS v1.4.0 -->
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-  <!-- 2. MarkerCluster JS v1.4.1 -->
+  <!-- MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-  <!-- 3. Windy Map Forecast SDK -->
+  <!-- Windy Map Forecast SDK -->
   <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
 
   <script>
     const options = {
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ',      // Replace with your Windy Map Forecast API key
+      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ', // Replace with your Windy API key
       lat: 51.1657,
       lon: 10.4515,
-      zoom: 6,
-      verbose: true
+      zoom: 6
     };
 
-    // Initialize Windy API
     windyInit(options, windyAPI => {
-      console.log('✅ Windy API ready', windyAPI);
+      // Windy map instance
+      const { map, store } = windyAPI;
 
-      // Destructure map, picker, and store
-      const { map, picker, store } = windyAPI;
+      // Set overlay (this will show the time slider automatically)
+      store.set('overlay', 'wind');
 
-      // 1. Add marker clusters
+      // Add marker clusters
       const markers = L.markerClusterGroup();
       fetch('https://n8n.beaglesystems.org/webhook/locations-json')
         .then(r => r.json())
@@ -120,18 +77,6 @@
           if (data.length) map.fitBounds(markers.getBounds().pad(0.2));
         })
         .catch(console.error);
-
-      // 2. Set the weather overlay type
-      store.set('overlay', 'wind');
-
-      // 3. Add the time slider control
-      // picker.addTo(map);
-
-      // Force the picker to stay visible
-      setTimeout(() => {
-        const pickerEl = document.querySelector('.windy-picker, .windy-picker-control');
-        if (pickerEl) pickerEl.style.display = 'block';
-      }, 1000);
     });
   </script>
 </body>
