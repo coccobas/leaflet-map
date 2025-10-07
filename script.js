@@ -10,7 +10,7 @@ const options = {
     // Optional: Initial state of the map
     lat: 53.5787, // Center latitude
     lon: 10.3485, // Center longitude
-    zoom: 13,     // Initial zoom level
+    zoom: 18,     // Initial zoom level for a closer view
 };
 
 // Initialize Windy API
@@ -19,15 +19,6 @@ windyInit(options, windyAPI => {
 
     // Set the maximum zoom level for the map
     map.setMaxZoom(22); // Allow zooming up to level 22
-
-    // Add a custom tile layer (OpenStreetMap)
-    const osmTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 22, // Maximum zoom level for the OSM layer
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    });
-
-    // Add the custom tile layer to the map
-    osmTileLayer.addTo(map);
 
     // Load the GeoJSON file
     fetch('Witzhave_A_01_FO_GEN2025_041_DFA45_full.geojson')
@@ -61,7 +52,7 @@ windyInit(options, windyAPI => {
 
             geojsonLayer.addTo(map);
 
-            // Fit bounds to the GeoJSON layer
+            // Optional: Fit bounds to the GeoJSON layer
             map.fitBounds(geojsonLayer.getBounds(), { maxZoom: 22 }); // Adjust maxZoom here if needed
         })
         .catch(error => console.error('Error loading GeoJSON:', error));
