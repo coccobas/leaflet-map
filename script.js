@@ -10,12 +10,15 @@ const options = {
     // Optional: Initial state of the map
     lat: 53.5787, // Center latitude
     lon: 10.3485, // Center longitude
-    zoom: 18,     // Increased zoom level for a closer view
+    zoom: 18,     // Initial zoom level for a closer view
 };
 
 // Initialize Windy API
 windyInit(options, windyAPI => {
     const { map } = windyAPI; // .map is an instance of Leaflet map
+
+    // Set the maximum zoom level for the map
+    map.setMaxZoom(22); // Allow zooming up to level 22
 
     // Load the GeoJSON file
     fetch('Witzhave_A_01_FO_GEN2025_041_DFA45_full.geojson')
@@ -49,6 +52,8 @@ windyInit(options, windyAPI => {
 
             geojsonLayer.addTo(map);
 
+            // Optional: Fit bounds to the GeoJSON layer
+            map.fitBounds(geojsonLayer.getBounds(), { maxZoom: 22 }); // Adjust maxZoom here if needed
         })
         .catch(error => console.error('Error loading GeoJSON:', error));
 });
