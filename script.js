@@ -1,5 +1,3 @@
-// filepath: /Users/b.cocco/Documents/leaflet-map/script.js
-
 const options = {
     // Required: API key
     key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ', // REPLACE WITH YOUR KEY !!!
