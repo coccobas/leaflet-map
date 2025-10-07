@@ -124,6 +124,12 @@
 
       // 3. Add the time slider control
       picker.addTo(map);
+
+      // Force the picker to stay visible
+      setTimeout(() => {
+        const pickerEl = document.querySelector('.windy-picker, .windy-picker-control');
+        if (pickerEl) pickerEl.style.display = 'block';
+      }, 1000);
     });
   </script>
 </body>
