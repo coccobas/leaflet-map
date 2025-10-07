@@ -48,7 +48,12 @@ windyInit(options, windyAPI => {
             });
 
             geojsonLayer.addTo(map);
-            map.fitBounds(geojsonLayer.getBounds());
+
+            // Option 1: Remove map.fitBounds() to keep the initial zoom level
+            // map.fitBounds(geojsonLayer.getBounds());
+
+            // Option 2: Use map.fitBounds() but set a maximum zoom level
+            map.fitBounds(geojsonLayer.getBounds(), { maxZoom: 18 });
         })
         .catch(error => console.error('Error loading GeoJSON:', error));
 });
