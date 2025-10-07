@@ -1,50 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <title>Windy Map Integration</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"/>
-
-  <style>
-    /* Ensure the Windy map container is visible */
-    #windy {
-      width: 100%;
-      height: 100vh; /* Full viewport height */
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-</head>
-<body>
-  <div id="windy"></div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-  <!-- Windy Map Forecast SDK -->
-  <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
-
-  <script>
-    // Windy API options
-    const options = {
-      key: 'PRS4fC97SBbNnbmDpLHxKKjYkD0o5iCZ', // Replace with your Windy API key
-      lat: 51.1657, // Center latitude
-      lon: 10.4515, // Center longitude
-      zoom: 6       // Initial zoom level
-    };
-
-    // Initialize the Windy map
-    windyInit(options, windyAPI => {
-      console.log('Windy API initialized:', windyAPI); // Debugging
-
-      // Access the Windy map and store
-      const { store } = windyAPI;
-
-      // Set the overlay to 'wind' (this will also display the time slider)
-      store.set('overlay', 'wind');
-    });
-  </script>
-</body>
+<html>
+    <head>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+        />
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+        <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+        <style>
+            #windy {
+                width: 100%;
+                height: 300px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="windy"></div>
+        <script src="script.js"></script>
+    </body>
 </html>
