@@ -33,6 +33,7 @@ windyInit(options, windyAPI => {
         if (currentZoom > 11) {
             // Hide Windy layer at zoom levels above 11
             store.set('overlay', null); // Disable Windy overlay
+            osmTileLayer.bringToFront(); // Ensure OSM tiles are on top
         } else {
             // Re-enable Windy layer at zoom levels 11 or below
             store.set('overlay', 'wind'); // Replace 'wind' with your desired overlay
